@@ -34,10 +34,9 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="216dp"
         android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:layout_weight="0.1">
+        android:layout_gravity="bottom">
 
         <Button
             android:layout_width="wrap_content"
@@ -204,14 +203,24 @@
             android:layout_toRightOf="@+id/num9"
             android:onClick="onClickOperator" />
 
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/plus"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/div"
+            android:id="@+id/list"
+            android:layout_weight="0.71"
+            android:layout_alignBottom="@+id/div" />
+
 
     </RelativeLayout>
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="11dp"
-        android:id="@+id/list"
-        android:layout_weight="0.71" />
+    <!--<ListView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="11dp"-->
+        <!--android:id="@+id/list"-->
+        <!--android:layout_weight="0.71" />-->
 
 
 </LinearLayout>
