@@ -216,11 +216,6 @@
 
     </RelativeLayout>
 
-    <!--<ListView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="11dp"-->
-        <!--android:id="@+id/list"-->
-        <!--android:layout_weight="0.71" />-->
 
 
 </LinearLayout>

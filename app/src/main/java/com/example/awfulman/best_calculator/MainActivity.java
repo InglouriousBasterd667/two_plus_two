@@ -1,6 +1,7 @@
 package com.example.awfulman.best_calculator;
 
 import android.app.ListActivity;
+import android.nfc.Tag;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.MovementMethod;
@@ -18,13 +19,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.awfulman.best_calculator.expressionSolver.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import static android.R.layout.simple_list_item_1;
 import static com.example.awfulman.best_calculator.expressionSolver.eval;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,14 +27,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int CM_DELETE_ID = 1;
 
     private TextView expression;
-    private ListView equations;
-
-//    List<String> equations_list = new ArrayList<>();
-//    private String str_expression = "0";
-//    private String result_str = "";
-//    private boolean last_num = false;
-//    private boolean has_dot = false;
-
     private Best_Calculator app;
     private ArrayAdapter<String> adapter;
 
@@ -48,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.d(TAG,"oncreate called!!!");
         this.app = (Best_Calculator) this.getApplication();
         expression = (TextView) findViewById(R.id.expression);
         expression.setText(app.str_expression);
@@ -62,24 +48,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        equations = (ListView) findViewById(R.id.list);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, equations_list);
+        ListView equations = (ListView) findViewById(R.id.list);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, app.equations_list);
         equations.setAdapter(adapter);
         registerForContextMenu(equations);
 
-
         Button solve = (Button) findViewById(R.id.solve);
+
         solve.setOnLongClickListener(new View.OnLongClickListener(){
             @Override
             public boolean onLongClick(View v){
                 onClickSolve(v);
                 if (!app.result_str.equals("")) sendTextToList(app.result_str);
+                app.result_str = "";
                 return true;
             }
         });
-
     }
+
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
@@ -104,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendTextToList(String text){
-        equations_list.add(text);
+        app.equations_list.add(text);
         adapter.notifyDataSetChanged();
 
     }
@@ -112,73 +98,77 @@ public class MainActivity extends AppCompatActivity {
     private void appendTextFromView(View v) {
         if ( v instanceof Button ){
             Button but = (Button) v;
-            if (str_expression.equals("0"))
-                str_expression = (String) but.getText();
+            if (app.str_expression.equals("0"))
+                app.str_expression = (String) but.getText();
             else
-                str_expression += but.getText();
+                app.str_expression += but.getText();
             UpdateExpression();
         }
     }
 
     private void UpdateExpression(){
-        expression.setText(str_expression);
+        expression.setText(app.str_expression);
     }
 
     public void onClickNumber(View v){
-        last_num = true;
+        app.last_num = true;
         appendTextFromView(v);
     }
 
     public void onClickOperator(View v){
-        if (last_num && !str_expression.equals("0")){
+        if (app.last_num && !app.str_expression.equals("0")){
             appendTextFromView(v);
-            last_num = false;
-            has_dot = false;
+            app.last_num = false;
+            app.has_dot = false;
         }
     }
 
     public void onClickDot(View v){
-        if (last_num && !has_dot && !str_expression.equals("0")){
-            has_dot = true;
+        if (app.last_num && !app.has_dot && !app.str_expression.equals("0")){
+            app.has_dot = true;
             Button but = (Button) v;
-            str_expression += but.getText();
+            app.str_expression += but.getText();
             UpdateExpression();
         }
     }
 
 
     private void validateString(String exp){
-        int len = str_expression.length();
+        int len = app.str_expression.length();
         if (len > 0) {
-            char last_char = str_expression.charAt(len - 1);
-            last_num = ('0' < last_char) &&
+            char last_char = app.str_expression.charAt(len - 1);
+            app.last_num = ('0' < last_char) &&
                     ('9' > last_char);
         }
 
     }
     public void onClickClear(View v){
-        int len = str_expression.length();
+        int len = app.str_expression.length();
         if ( len != 0) {
-            char deleted_char = str_expression.charAt(len - 1);
-            if (deleted_char == '.')
-                has_dot = false;
-            str_expression = str_expression.substring(0, len - 1);
-            validateString(str_expression);
+            char deleted_char = app.str_expression.charAt(len - 1);
+            if (deleted_char == '.') app.has_dot = false;
+            app.str_expression = app.str_expression.substring(0, len - 1);
+            validateString(app.str_expression);
             UpdateExpression();
         }
     }
 
     public void onClickSolve(View v){
-        if(last_num){
-            result_str = str_expression;
-            double result = eval(str_expression);
+        if(app.last_num){
+            app.result_str = app.str_expression;
+            double result = 0;
+            try {
+                result = eval(app.str_expression);
+            }
+            catch(Exception e){
+                 result = 0;
+            }
             if (result == Math.round(result))
-                str_expression = Integer.toString(Double.valueOf(result).intValue());
+                app.str_expression = Integer.toString(Double.valueOf(result).intValue());
             else
-                str_expression = Double.toString(result);
-            result_str += (" = " + str_expression);
+                app.str_expression = Double.toString(result);
+            app.result_str += (" = " + app.str_expression);
             UpdateExpression();
         }
-
     }
 }
